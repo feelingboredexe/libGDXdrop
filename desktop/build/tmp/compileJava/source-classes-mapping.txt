@@ -1,0 +1,2 @@
+com/idiotswithsticks/game/desktop/DesktopLauncher.java
+ com.idiotswithsticks.game.desktop.DesktopLauncher

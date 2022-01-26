@@ -1,0 +1,2 @@
+com/idiotswithsticks/game/libGDXtest.java
+ com.idiotswithsticks.game.libGDXtest
