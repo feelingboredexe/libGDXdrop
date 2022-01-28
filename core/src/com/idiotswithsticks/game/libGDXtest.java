@@ -7,6 +7,8 @@ import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.audio.*;
 
+import java.util.Iterator;
+
 public class libGDXtest extends ApplicationAdapter {
 	private SpriteBatch batch;
 	private Texture dropImage;
@@ -20,7 +22,13 @@ public class libGDXtest extends ApplicationAdapter {
 	private OrthographicCamera camera;
 
 	private void spawnRaindrop() {
-
+		Rectangle raindrop = new Rectangle();
+		raindrop.x = MathUtils.random(0, 800-64);
+		raindrop.y = 480;
+		raindrop.width = 64;
+		raindrop.height = 64;
+		raindrops.add(raindrop);
+		lastDropTime = TimeUtils.nanoTime();
 	}
 
 	@Override
@@ -28,6 +36,8 @@ public class libGDXtest extends ApplicationAdapter {
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 800, 480);
 		batch = new SpriteBatch();
+		raindrops = new Array<Rectangle>();
+		spawnRaindrop();
 
 		dropImage = new Texture(Gdx.files.internal("droplet.png"));
 		bucketImage = new Texture(Gdx.files.internal("bucket.png"));
@@ -53,7 +63,22 @@ public class libGDXtest extends ApplicationAdapter {
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 		batch.draw(bucketImage, bucket.x, bucket.y);
+		for (Rectangle raindrop: raindrops) {
+			batch.draw(dropImage, raindrop.x, raindrop.y);
+		}
 		batch.end();
+
+		if (TimeUtils.nanoTime() - lastDropTime > 1000000000) spawnRaindrop();
+
+		for (Iterator<Rectangle> iter = raindrops.iterator(); iter.hasNext(); ) {
+			Rectangle raindrop = iter.next();
+			raindrop.y -= 200 * Gdx.graphics.getDeltaTime();
+			if(raindrop.y + 64 < 0) iter.remove();
+			if (raindrop.overlaps(bucket)) {
+				dropSound.play();
+				iter.remove();
+			}
+		}
 
 		if (Gdx.input.isTouched()) { // if mouse button is clicked or if screen is touched
 			Vector3 touchPos = new Vector3();
